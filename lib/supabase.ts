@@ -28,13 +28,47 @@ export interface SchoolStats {
 }
 
 // API functions
-export const submitRegistration = async (data: Omit<Registration, 'id' | 'created_at'>): Promise<{ success: boolean; error?: string }> => {
+
+// Check for duplicate registration (same name AND phone)
+export const checkDuplicateRegistration = async (name: string, phone: string): Promise<{ exists: boolean; error?: string }> => {
+    if (!supabase) {
+        // Mock: always return no duplicate
+        return { exists: false };
+    }
+
+    try {
+        const { data, error } = await supabase
+            .from('registrations')
+            .select('id')
+            .eq('name', name)
+            .eq('phone', phone)
+            .limit(1);
+
+        if (error) {
+            console.error('Duplicate check error:', error);
+            return { exists: false, error: error.message };
+        }
+
+        return { exists: (data && data.length > 0) };
+    } catch (err) {
+        console.error('Duplicate check error:', err);
+        return { exists: false, error: 'Failed to check duplicate' };
+    }
+};
+
+export const submitRegistration = async (data: Omit<Registration, 'id' | 'created_at'>): Promise<{ success: boolean; error?: string; isDuplicate?: boolean }> => {
     if (!supabase) {
         console.log('Mock submission:', data);
         return { success: true };
     }
 
     try {
+        // Check for duplicate first
+        const duplicateCheck = await checkDuplicateRegistration(data.name, data.phone);
+        if (duplicateCheck.exists) {
+            return { success: false, error: '이미 동일한 이름과 연락처로 신청된 내역이 있습니다.', isDuplicate: true };
+        }
+
         const { error } = await supabase
             .from('registrations')
             .insert([{

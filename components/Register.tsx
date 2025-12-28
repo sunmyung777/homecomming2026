@@ -51,6 +51,8 @@ export const Register: React.FC<RegisterProps> = ({ selectedSchool, setSelectedS
     }
   };
 
+  const [isDuplicate, setIsDuplicate] = useState(false);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -72,6 +74,8 @@ export const Register: React.FC<RegisterProps> = ({ selectedSchool, setSelectedS
 
       if (result.success) {
         setIsSuccess(true);
+      } else if (result.isDuplicate) {
+        setIsDuplicate(true);
       } else {
         alert('신청 중 오류가 발생했습니다: ' + (result.error || '다시 시도해주세요.'));
       }
@@ -82,6 +86,68 @@ export const Register: React.FC<RegisterProps> = ({ selectedSchool, setSelectedS
       setIsSubmitting(false);
     }
   };
+
+  // Duplicate registration modal component
+  const DuplicateModal = () => (
+    <AnimatePresence>
+      {isDuplicate && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+        >
+          {/* Backdrop */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 bg-brand-bg/80 backdrop-blur-md"
+            onClick={() => setIsDuplicate(false)}
+          />
+
+          {/* Modal content */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+            transition={{ type: "spring", damping: 25, stiffness: 300 }}
+            className="relative z-10 text-center bg-gradient-to-br from-white/10 to-white/5 p-10 md:p-12 rounded-3xl border border-accent-rose/30 backdrop-blur-xl max-w-md w-full shadow-2xl"
+          >
+            {/* Close button */}
+            <button
+              onClick={() => setIsDuplicate(false)}
+              className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
+            >
+              <span className="text-white/60 text-lg">×</span>
+            </button>
+
+            {/* Warning icon */}
+            <div className="w-20 h-20 bg-gradient-to-br from-accent-rose/20 to-accent-roseDark/20 rounded-full flex items-center justify-center mx-auto mb-6">
+              <div className="w-14 h-14 bg-gradient-to-br from-accent-rose to-accent-roseDark rounded-full flex items-center justify-center">
+                <span className="text-white text-2xl font-bold">!</span>
+              </div>
+            </div>
+
+            <h3 className="font-sans font-bold text-2xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-accent-rose to-accent-roseDark mb-4">
+              이미 신청됨
+            </h3>
+            <p className="text-brand-line mb-6 leading-relaxed text-sm md:text-base">
+              동일한 이름과 연락처로<br />
+              이미 참가 신청이 완료되었습니다.
+            </p>
+
+            <button
+              onClick={() => setIsDuplicate(false)}
+              className="w-full py-3 bg-gradient-to-r from-accent-rose to-accent-roseDark text-white font-bold rounded-xl hover:shadow-lg hover:shadow-accent-rose/30 transition-all"
+            >
+              확인
+            </button>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
 
   // Success popup modal component
   const SuccessModal = () => (
@@ -161,6 +227,8 @@ export const Register: React.FC<RegisterProps> = ({ selectedSchool, setSelectedS
     <Section id="register" className="relative overflow-hidden mt-20">
       {/* Success Modal */}
       <SuccessModal />
+      {/* Duplicate Modal */}
+      <DuplicateModal />
 
       {/* Decorative background elements */}
       <div className="absolute inset-0 pointer-events-none">
