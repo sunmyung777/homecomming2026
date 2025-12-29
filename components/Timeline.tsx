@@ -1,6 +1,6 @@
-import React, { useRef, useState, useEffect } from 'react';
-import { motion, useScroll, useMotionValueEvent } from 'framer-motion';
-import { Calendar, ImageIcon } from 'lucide-react';
+import React, { useRef, useState } from 'react';
+import { motion, useScroll, useMotionValueEvent, AnimatePresence } from 'framer-motion';
+import { Calendar } from 'lucide-react';
 
 interface TimelineEvent {
     id: string;
@@ -114,7 +114,7 @@ const timelineData: TimelineEvent[] = [
     },
 ];
 
-// Single event card component - now uses state for instant switching
+// Single event card component
 const EventCard: React.FC<{ event: TimelineEvent; isActive: boolean }> = ({ event, isActive }) => {
     const renderImages = () => {
         const images = event.images;
@@ -122,21 +122,21 @@ const EventCard: React.FC<{ event: TimelineEvent; isActive: boolean }> = ({ even
 
         if (count === 1) {
             return (
-                <div className="relative w-full h-full rounded-2xl overflow-hidden shadow-2xl border border-white/10">
+                <div className="relative w-full h-full rounded-xl overflow-hidden border border-white/10">
                     <img src={images[0]} alt={event.title} className="w-full h-full object-cover" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
                 </div>
             );
         } else {
             return (
                 <>
-                    <div className="absolute top-0 left-0 w-[55%] h-[70%] rounded-2xl overflow-hidden shadow-2xl border border-white/10 z-10">
+                    <div className="absolute top-0 left-0 w-[55%] h-[70%] rounded-xl overflow-hidden border border-white/10 z-10">
                         <img src={images[0]} alt="" className="w-full h-full object-cover" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
                     </div>
-                    <div className="absolute top-[15%] right-0 w-[50%] h-[55%] rounded-2xl overflow-hidden shadow-2xl border border-white/10 z-20">
+                    <div className="absolute top-[15%] right-0 w-[50%] h-[55%] rounded-xl overflow-hidden border border-white/10 z-20">
                         <img src={images[1]} alt="" className="w-full h-full object-cover" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
                     </div>
                     {images[2] && (
-                        <div className="absolute bottom-0 right-[10%] w-[45%] h-[45%] rounded-2xl overflow-hidden shadow-2xl border border-white/10 z-30">
+                        <div className="absolute bottom-0 right-[10%] w-[45%] h-[45%] rounded-xl overflow-hidden border border-white/10 z-30">
                             <img src={images[2]} alt="" className="w-full h-full object-cover" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
                         </div>
                     )}
@@ -145,46 +145,48 @@ const EventCard: React.FC<{ event: TimelineEvent; isActive: boolean }> = ({ even
         }
     };
 
-    if (!isActive) return null;
-
     return (
-        <motion.div
-            key={event.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3 }}
-            className="absolute inset-0 flex items-center px-8 md:px-16 lg:px-24"
-        >
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center max-w-7xl mx-auto w-full">
-                {/* Left: Text Content */}
-                <div className="space-y-4">
-                    <p className="text-accent-gold/80 text-sm font-medium uppercase tracking-widest flex items-center gap-2">
-                        <Calendar className="w-4 h-4" />
-                        {event.date}
-                    </p>
+        <AnimatePresence mode="wait">
+            {isActive && (
+                <motion.div
+                    key={event.id}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="absolute inset-0 flex items-center px-8 md:px-16 lg:px-24"
+                >
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center max-w-7xl mx-auto w-full">
+                        {/* Left: Text Content */}
+                        <div className="space-y-4">
+                            <p className="text-accent-gold/60 text-sm font-medium uppercase tracking-widest flex items-center gap-2">
+                                <Calendar className="w-4 h-4" />
+                                {event.date}
+                            </p>
 
-                    <h2 className="font-sans font-black text-4xl md:text-5xl lg:text-6xl text-brand-text leading-[0.95]">
-                        {event.title}
-                    </h2>
+                            <h2 className="font-sans font-black text-4xl md:text-5xl text-brand-text leading-tight">
+                                {event.title}
+                            </h2>
 
-                    {event.isUpcoming && (
-                        <span className="inline-block px-3 py-1 bg-accent-gold/20 text-accent-gold text-xs font-bold uppercase tracking-wider rounded-full animate-pulse">
-                            Coming Soon
-                        </span>
-                    )}
+                            {event.isUpcoming && (
+                                <span className="inline-block px-3 py-1 bg-accent-gold/10 text-accent-gold text-xs font-medium uppercase tracking-wider rounded-full">
+                                    Coming Soon
+                                </span>
+                            )}
 
-                    <p className="text-brand-text/70 text-base md:text-lg leading-relaxed max-w-lg">
-                        {event.description}
-                    </p>
-                </div>
+                            <p className="text-brand-text/60 text-base leading-relaxed max-w-lg">
+                                {event.description}
+                            </p>
+                        </div>
 
-                {/* Right: Images */}
-                <div className="relative h-[280px] md:h-[350px] lg:h-[400px]">
-                    {renderImages()}
-                </div>
-            </div>
-        </motion.div>
+                        {/* Right: Images */}
+                        <div className="relative h-[280px] md:h-[350px] lg:h-[400px]">
+                            {renderImages()}
+                        </div>
+                    </div>
+                </motion.div>
+            )}
+        </AnimatePresence>
     );
 };
 
@@ -199,7 +201,6 @@ export const Timeline: React.FC = () => {
 
     const eventCount = timelineData.length;
 
-    // Update active index based on scroll position
     useMotionValueEvent(scrollYProgress, "change", (latest) => {
         const newIndex = Math.min(
             Math.floor(latest * eventCount),
@@ -210,11 +211,9 @@ export const Timeline: React.FC = () => {
         }
     });
 
-    // Scroll to specific event when clicking on timeline bar
     const scrollToEvent = (index: number) => {
         if (!containerRef.current) return;
 
-        const containerRect = containerRef.current.getBoundingClientRect();
         const containerTop = containerRef.current.offsetTop;
         const totalHeight = containerRef.current.scrollHeight;
         const sectionHeight = totalHeight / eventCount;
@@ -228,19 +227,13 @@ export const Timeline: React.FC = () => {
     };
 
     return (
-        <section id="timeline" ref={containerRef} className="relative bg-gradient-to-br from-brand-deep via-brand-bg to-brand-deep">
-            {/* This creates the scroll height - each event gets ~100vh of scroll space */}
-            <div style={{ height: `${eventCount * 100}vh` }}>
-                {/* Sticky container that stays in view */}
+        <section id="timeline" ref={containerRef} className="relative bg-brand-deep">
+            {/* Reduced scroll height: 70vh per event instead of 100vh */}
+            <div style={{ height: `${eventCount * 70}vh` }}>
+                {/* Sticky container */}
                 <div className="sticky top-0 h-screen overflow-hidden">
-                    {/* Background decoration */}
-                    <div className="absolute inset-0 pointer-events-none">
-                        <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-accent-gold/5 to-transparent" />
-                        <div className="absolute bottom-0 left-0 w-1/3 h-1/2 bg-gradient-to-tr from-accent-teal/5 to-transparent" />
-                    </div>
-
                     {/* Main Content Area */}
-                    <div className="relative z-10 h-[calc(100vh-160px)] flex items-center pt-16">
+                    <div className="relative z-10 h-[calc(100vh-140px)] flex items-center pt-16">
                         {timelineData.map((event, idx) => (
                             <EventCard
                                 key={event.id}
@@ -251,15 +244,15 @@ export const Timeline: React.FC = () => {
                     </div>
 
                     {/* Bottom Timeline Bar */}
-                    <div className="absolute bottom-0 left-0 right-0 h-[160px] bg-gradient-to-t from-brand-bg via-brand-bg/90 to-transparent">
+                    <div className="absolute bottom-0 left-0 right-0 h-[140px] bg-gradient-to-t from-brand-deep to-transparent">
                         <div className="h-full max-w-6xl mx-auto px-6 flex items-end pb-8">
                             <div className="relative w-full">
                                 {/* Background line */}
-                                <div className="absolute bottom-[22px] left-0 right-0 h-[2px] bg-brand-line/20" />
+                                <div className="absolute bottom-5 left-0 right-0 h-px bg-white/10" />
 
                                 {/* Progress line */}
                                 <motion.div
-                                    className="absolute bottom-[22px] left-0 h-[2px] bg-accent-gold origin-left"
+                                    className="absolute bottom-5 left-0 h-px bg-accent-gold origin-left"
                                     style={{ scaleX: scrollYProgress }}
                                 />
 
@@ -269,30 +262,24 @@ export const Timeline: React.FC = () => {
                                         <button
                                             key={event.id}
                                             onClick={() => scrollToEvent(idx)}
-                                            className="flex flex-col items-center cursor-pointer hover:scale-105 transition-transform"
+                                            className="flex flex-col items-center cursor-pointer group"
                                             style={{ flex: 1 }}
                                         >
                                             {/* Event name */}
                                             <span
-                                                className={`text-[8px] md:text-[10px] font-medium text-center leading-tight mb-2 px-0.5 h-8 flex items-end justify-center transition-colors duration-200 ${idx === activeIndex ? 'text-accent-gold' : 'text-brand-line/40 hover:text-brand-line/70'
+                                                className={`text-[8px] md:text-[10px] font-medium text-center leading-tight mb-2 px-0.5 h-8 flex items-end justify-center transition-colors duration-200 ${idx === activeIndex ? 'text-accent-gold' : 'text-brand-line/30 group-hover:text-brand-line/60'
                                                     }`}
                                             >
                                                 {event.title}
                                             </span>
 
-                                            {/* Dot */}
+                                            {/* Dot - larger for better touch target */}
                                             <div
-                                                className={`w-3 h-3 rounded-full transition-all duration-200 ${idx === activeIndex
-                                                    ? 'bg-accent-gold shadow-lg shadow-accent-gold/50'
-                                                    : idx < activeIndex
-                                                        ? 'bg-accent-gold/60'
-                                                        : 'bg-brand-line/30 hover:bg-brand-line/50'
-                                                    }`}
-                                            />
-
-                                            {/* Active bar indicator */}
-                                            <div
-                                                className={`w-10 h-1 rounded-full mt-2 transition-opacity duration-200 ${idx === activeIndex ? 'bg-accent-gold opacity-100' : 'opacity-0'
+                                                className={`w-4 h-4 rounded-full transition-all duration-200 ${idx === activeIndex
+                                                        ? 'bg-accent-gold'
+                                                        : idx < activeIndex
+                                                            ? 'bg-accent-gold/50'
+                                                            : 'bg-white/20 group-hover:bg-white/30'
                                                     }`}
                                             />
                                         </button>

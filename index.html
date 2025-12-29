@@ -53,60 +53,24 @@
         extend: {
           colors: {
             brand: {
-              bg: '#353051', // Deep Indigo / Navy Purple
-              text: '#DBD1E1', // Light Lavender Gray
-              mid: '#5E417F', // Mid Purple
-              deep: '#49376B', // Deep Purple
-              line: '#9687A6', // Soft Purple Gray
-              yonsei: '#164075', // Brand Blue (muted)
-              korea: '#781820', // Brand Red (muted)
+              bg: '#353051',
+              text: '#DBD1E1',
+              mid: '#5E417F',
+              deep: '#49376B',
+              line: '#9687A6',
+              yonsei: '#164075',
+              korea: '#781820',
             },
             accent: {
-              gold: '#C9A962', // Premium gold
-              goldLight: '#E8D5A3', // Light gold
-              goldDark: '#8B7435', // Deep gold
-              teal: '#4A9E9E', // Complementary teal
-              tealLight: '#7FDBDB', // Cyan glow
-              rose: '#D4A5A5', // Soft rose
-              roseDark: '#A84B52', // Deep rose
+              gold: '#C9A962',
+              goldLight: '#E8D5A3',
+              goldDark: '#8B7435',
             }
           },
           fontFamily: {
             sans: ['Inter', 'sans-serif'],
             serif: ['Playfair Display', 'serif'],
           },
-          animation: {
-            'float': 'float 6s ease-in-out infinite',
-            'float-slow': 'float 8s ease-in-out infinite',
-            'float-fast': 'float 4s ease-in-out infinite',
-            'float-delayed': 'float 6s ease-in-out infinite 3s',
-            'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-            'pulse-glow': 'pulseGlow 3s ease-in-out infinite',
-            'gradient': 'gradient 8s ease infinite',
-            'shimmer': 'shimmer 2s linear infinite',
-          },
-          keyframes: {
-            float: {
-              '0%, 100%': { transform: 'translateY(0)' },
-              '50%': { transform: 'translateY(-20px)' },
-            },
-            pulseGlow: {
-              '0%, 100%': { opacity: '0.4', transform: 'scale(1)' },
-              '50%': { opacity: '0.8', transform: 'scale(1.05)' },
-            },
-            gradient: {
-              '0%, 100%': { backgroundPosition: '0% 50%' },
-              '50%': { backgroundPosition: '100% 50%' },
-            },
-            shimmer: {
-              '0%': { backgroundPosition: '-200% 0' },
-              '100%': { backgroundPosition: '200% 0' },
-            }
-          },
-          backgroundSize: {
-            '300%': '300%',
-            '400%': '400%',
-          }
         }
       }
     }
@@ -116,19 +80,6 @@
       background-color: #353051;
       color: #DBD1E1;
       overflow-x: hidden;
-    }
-
-    /* Noise Texture Overlay */
-    .bg-noise {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: 50;
-      opacity: 0.05;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
     }
 
     /* Custom Scrollbar */
@@ -148,16 +99,6 @@
     ::-webkit-scrollbar-thumb:hover {
       background: #9687A6;
     }
-
-    /* Glow Utility */
-    .glow-text {
-      text-shadow: 0 0 30px rgba(219, 209, 225, 0.4);
-    }
-
-    .text-outline {
-      -webkit-text-stroke: 1px rgba(219, 209, 225, 0.3);
-      color: transparent;
-    }
   </style>
   <script type="importmap">
 {
@@ -175,7 +116,6 @@
 
 <body>
   <div id="root"></div>
-  <div class="bg-noise"></div>
   <script type="module" src="/index.tsx"></script>
 </body>
 
