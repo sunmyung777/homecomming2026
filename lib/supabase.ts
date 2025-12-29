@@ -142,3 +142,41 @@ export const subscribeToStats = (callback: (stats: { yonsei: number; korea: numb
         }
     };
 };
+
+// Get registrants list by school
+export interface Registrant {
+    batch: string;
+    name: string;
+}
+
+export const getRegistrantsBySchool = async (school: 'YONSEI' | 'KOREA'): Promise<Registrant[]> => {
+    if (!supabase) {
+        // Return mock data
+        return [
+            { batch: '29기', name: '홍길동' },
+            { batch: '28기', name: '김철수' },
+            { batch: '27기', name: '이영희' },
+            { batch: '29기', name: '홍길동' },
+            { batch: '28기', name: '김철수' },
+            { batch: '27기', name: '이영희' },
+        ];
+    }
+
+    try {
+        const { data, error } = await supabase
+            .from('registrations')
+            .select('batch, name')
+            .eq('school', school)
+            .order('batch', { ascending: true });
+
+        if (error) {
+            console.error('Registrants fetch error:', error);
+            return [];
+        }
+
+        return data || [];
+    } catch (err) {
+        console.error('Registrants error:', err);
+        return [];
+    }
+};

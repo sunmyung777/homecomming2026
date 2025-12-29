@@ -143,8 +143,8 @@ export const Register: React.FC<RegisterProps> = ({ selectedSchool, setSelectedS
             <button
               onClick={onClose}
               className={`w-full py-3 font-bold rounded-xl transition-colors ${isError
-                  ? 'bg-red-500/20 text-red-400 hover:bg-red-500/30'
-                  : 'bg-accent-gold text-brand-bg hover:bg-accent-goldLight'
+                ? 'bg-red-500/20 text-red-400 hover:bg-red-500/30'
+                : 'bg-accent-gold text-brand-bg hover:bg-accent-goldLight'
                 }`}
             >
               {buttonText}
@@ -194,7 +194,7 @@ export const Register: React.FC<RegisterProps> = ({ selectedSchool, setSelectedS
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="bg-white/5 rounded-2xl border border-white/10 p-8 md:p-10"
+          className="bg-white/5 rounded-2xl border border-white/10 p-8 md:p-10 mb-16"
         >
           <form onSubmit={handleSubmit} className="space-y-8">
             {/* School Toggle */}
@@ -203,8 +203,8 @@ export const Register: React.FC<RegisterProps> = ({ selectedSchool, setSelectedS
                 type="button"
                 onClick={() => setSelectedSchool(School.YONSEI)}
                 className={`px-5 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${selectedSchool === School.YONSEI
-                    ? 'bg-[#164075] text-white'
-                    : 'text-brand-line hover:text-white'
+                  ? 'bg-[#164075] text-white'
+                  : 'text-brand-line hover:text-white'
                   }`}
               >
                 YONSEI
@@ -213,8 +213,8 @@ export const Register: React.FC<RegisterProps> = ({ selectedSchool, setSelectedS
                 type="button"
                 onClick={() => setSelectedSchool(School.KOREA)}
                 className={`px-5 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${selectedSchool === School.KOREA
-                    ? 'bg-[#781820] text-white'
-                    : 'text-brand-line hover:text-white'
+                  ? 'bg-[#781820] text-white'
+                  : 'text-brand-line hover:text-white'
                   }`}
               >
                 KOREA
@@ -259,7 +259,7 @@ export const Register: React.FC<RegisterProps> = ({ selectedSchool, setSelectedS
                       className="w-full bg-white/5 border border-white/10 rounded-lg py-3.5 px-4 text-brand-text focus:border-accent-gold/50 focus:outline-none transition-colors appearance-none cursor-pointer"
                     >
                       <option value="" disabled className="bg-brand-bg text-brand-line">기수 선택</option>
-                      {Array.from({ length: 29 }, (_, i) => 29 - i).map(num => (
+                      {Array.from({ length: 29 }, (_, i) => i + 1).map(num => (
                         <option key={num} value={`${num}기`} className="bg-brand-bg text-brand-text">
                           {num}기
                         </option>
@@ -313,8 +313,8 @@ export const Register: React.FC<RegisterProps> = ({ selectedSchool, setSelectedS
               type="submit"
               disabled={isSubmitting || !selectedSchool}
               className={`w-full py-4 rounded-xl font-medium transition-all duration-200 flex items-center justify-center gap-2 ${isSubmitting || !selectedSchool
-                  ? 'bg-white/5 text-brand-line/30 cursor-not-allowed'
-                  : 'bg-accent-gold text-brand-bg hover:bg-accent-goldLight'
+                ? 'bg-white/5 text-brand-line/30 cursor-not-allowed'
+                : 'bg-accent-gold text-brand-bg hover:bg-accent-goldLight'
                 }`}
             >
               {isSubmitting ? (

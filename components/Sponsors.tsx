@@ -2,12 +2,7 @@ import React from 'react';
 import { Section } from './ui/Section';
 
 const SPONSORS = [
-  { name: '김연세', company: 'Naver' },
-  { name: '이고려', company: 'Samsung Electronics' },
-  { name: '박창업', company: 'Toss' },
-  { name: '최투자', company: 'SoftBank Ventures' },
-  { name: '정스타', company: 'Woowa Bros' },
-  { name: '이혁신', company: 'Kakao' },
+  { name: '선배님 성함', company: '선배님 회사' },
 ];
 
 export const Sponsors: React.FC = () => {
@@ -31,10 +26,10 @@ export const Sponsors: React.FC = () => {
         </div>
 
         <div className="mt-32 pt-8 border-t border-brand-line/5 flex flex-col md:flex-row justify-between text-brand-line/40 text-xs tracking-wider">
-          <p className="mb-2">INSIDERS 2026 GREAT GALLOP</p>
+          <p className="mb-2">INSIDERS 2026 창립제</p>
           <div className="flex gap-4">
-            <span>INSTAGRAM</span>
-            <span>CONTACT</span>
+            <a href="https://www.instagram.com/insiders_mafia/" target="_blank" rel="noopener noreferrer">INSTAGRAM</a>
+            <a href="mailto:insiders@insiders.co.kr" target="_blank" rel="noopener noreferrer">CONTACT</a>
           </div>
         </div>
       </div>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { Home, Info, Swords, Ticket, UserPlus, Calendar } from 'lucide-react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Home, Info, Swords, Ticket, UserPlus, Heart, Gamepad2 } from 'lucide-react';
 
 const navItems = [
     { id: 'hero', label: 'Home', icon: Home },
@@ -8,12 +8,14 @@ const navItems = [
     { id: 'battle', label: 'Battle', icon: Swords },
     { id: 'ticket', label: 'Ticket', icon: Ticket },
     { id: 'register', label: 'Register', icon: UserPlus },
-    { id: 'timeline', label: '29th insiders', icon: Calendar },
+    { id: 'sponsors', label: 'Sponsors', icon: Heart },
 ];
 
 export const Navbar: React.FC = () => {
     const [activeSection, setActiveSection] = useState('hero');
     const [isScrolled, setIsScrolled] = useState(false);
+    const navigate = useNavigate();
+    const location = useLocation();
 
     useEffect(() => {
         const handleScroll = () => {
@@ -36,9 +38,21 @@ export const Navbar: React.FC = () => {
     }, []);
 
     const scrollToSection = (id: string) => {
-        const element = document.getElementById(id);
-        if (element) {
-            element.scrollIntoView({ behavior: 'smooth' });
+        // If not on home page, navigate home first
+        if (location.pathname !== '/') {
+            navigate('/');
+            // Wait for navigation then scroll
+            setTimeout(() => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.scrollIntoView({ behavior: 'smooth' });
+                }
+            }, 100);
+        } else {
+            const element = document.getElementById(id);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth' });
+            }
         }
     };
 
@@ -65,7 +79,7 @@ export const Navbar: React.FC = () => {
                     <div className="hidden md:flex items-center gap-1">
                         {navItems.map((item) => {
                             const Icon = item.icon;
-                            const isActive = activeSection === item.id;
+                            const isActive = activeSection === item.id && location.pathname === '/';
                             return (
                                 <button
                                     key={item.id}
@@ -80,13 +94,25 @@ export const Navbar: React.FC = () => {
                                 </button>
                             );
                         })}
+
+                        {/* Playground Button - Distinct styling */}
+                        <Link
+                            to="/playground"
+                            className={`ml-2 px-4 py-2 rounded-lg text-sm font-bold transition-all duration-200 flex items-center gap-2 border ${location.pathname === '/playground'
+                                    ? 'bg-accent-gold text-brand-bg border-accent-gold'
+                                    : 'border-accent-gold/50 text-accent-gold hover:bg-accent-gold/10 hover:border-accent-gold'
+                                }`}
+                        >
+                            <Gamepad2 className="w-4 h-4" />
+                            <span>Playground</span>
+                        </Link>
                     </div>
 
                     {/* Mobile Navigation */}
                     <div className="flex md:hidden items-center gap-1">
-                        {navItems.slice(0, 4).map((item) => {
+                        {navItems.slice(0, 3).map((item) => {
                             const Icon = item.icon;
-                            const isActive = activeSection === item.id;
+                            const isActive = activeSection === item.id && location.pathname === '/';
                             return (
                                 <button
                                     key={item.id}
@@ -100,6 +126,16 @@ export const Navbar: React.FC = () => {
                                 </button>
                             );
                         })}
+                        {/* Mobile Playground Button */}
+                        <Link
+                            to="/playground"
+                            className={`p-2 rounded-lg transition-colors duration-200 border ${location.pathname === '/playground'
+                                    ? 'bg-accent-gold/20 text-accent-gold border-accent-gold/50'
+                                    : 'border-accent-gold/30 text-accent-gold/70 hover:text-accent-gold'
+                                }`}
+                        >
+                            <Gamepad2 className="w-5 h-5" />
+                        </Link>
                     </div>
                 </div>
             </div>

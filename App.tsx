@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import { Routes, Route } from 'react-router-dom';
 import { Hero } from './components/Hero';
 import { Explain } from './components/Explain';
 import { Battle } from './components/Battle';
@@ -7,15 +8,16 @@ import { Register } from './components/Register';
 import { Sponsors } from './components/Sponsors';
 import { Timeline } from './components/Timeline';
 import { Navbar } from './components/Navbar';
+import { PlaygroundPage } from './components/Playground/PlaygroundPage';
 import { School } from './types';
 
-function App() {
+// Home page component (current landing page)
+function HomePage() {
   const [selectedSchool, setSelectedSchool] = useState<School | null>(null);
   const registerRef = useRef<HTMLDivElement>(null);
 
   const handleTicketSelect = (school: School) => {
     setSelectedSchool(school);
-    // Smooth scroll to register section
     if (registerRef.current) {
       registerRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
@@ -28,8 +30,8 @@ function App() {
   };
 
   return (
-    <main className="relative w-full bg-brand-bg text-brand-text selection:bg-brand-mid selection:text-white">
-      {/* School selection background overlay with film-like animation */}
+    <>
+      {/* School selection background overlay */}
       <div
         className={`fixed inset-0 pointer-events-none z-[5] transition-all duration-1000 ease-out ${selectedSchool === School.YONSEI
           ? 'bg-[#4B73A8]/[0.06] opacity-100'
@@ -52,15 +54,24 @@ function App() {
       <Battle />
       <Ticket onSelect={handleTicketSelect} />
 
-      {/* Wrapper to attach ref for scrolling */}
       <div ref={registerRef}>
         <Register
           selectedSchool={selectedSchool}
           setSelectedSchool={setSelectedSchool}
         />
       </div>
-      <Timeline />
-      {/* <Sponsors /> */}
+      <Sponsors />
+    </>
+  );
+}
+
+function App() {
+  return (
+    <main className="relative w-full bg-brand-bg text-brand-text selection:bg-brand-mid selection:text-white">
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/playground" element={<PlaygroundPage />} />
+      </Routes>
     </main>
   );
 }
