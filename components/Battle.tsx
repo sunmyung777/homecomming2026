@@ -18,6 +18,9 @@ export const Battle: React.FC = () => {
   const [showAllYonsei, setShowAllYonsei] = useState(false);
   const [showAllKorea, setShowAllKorea] = useState(false);
 
+  // Blur control for participant list - set to false to reveal participants
+  const isBlurred = true;
+
   // Fetch initial stats and registrants
   useEffect(() => {
     const fetchData = async () => {
@@ -87,12 +90,14 @@ export const Battle: React.FC = () => {
     registrants,
     showAll,
     onToggle,
-    color
+    color,
+    isBlurred
   }: {
     registrants: Registrant[];
     showAll: boolean;
     onToggle: () => void;
     color: 'yonsei' | 'korea';
+    isBlurred: boolean;
   }) => {
     const displayList = showAll ? registrants : registrants.slice(0, INITIAL_SHOW_COUNT);
     const hasMore = registrants.length > INITIAL_SHOW_COUNT;
@@ -105,8 +110,17 @@ export const Battle: React.FC = () => {
     }
 
     return (
-      <div className="mt-4 w-full">
-        <div className="flex flex-col items-center gap-0.5">
+      <div className="mt-4 w-full relative">
+        {/* Overlay message when blurred */}
+        {isBlurred && (
+          <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
+            <p className="text-brand-line/40 text-xs font-medium text-center px-2">
+              참가자 명단이 곧 공개됩니다!
+            </p>
+          </div>
+        )}
+
+        <div className={`flex flex-col items-center gap-0.5 ${isBlurred ? 'blur-sm select-none' : ''}`}>
           {displayList.map((reg, idx) => (
             <span
               key={idx}
@@ -119,7 +133,7 @@ export const Battle: React.FC = () => {
         </div>
 
 
-        {hasMore && (
+        {hasMore && !isBlurred && (
           <button
             onClick={onToggle}
             className={`mt-3 text-xs flex items-center justify-center gap-1 mx-auto transition-colors ${color === 'yonsei'
@@ -208,6 +222,7 @@ export const Battle: React.FC = () => {
               showAll={showAllYonsei}
               onToggle={() => setShowAllYonsei(!showAllYonsei)}
               color="yonsei"
+              isBlurred={isBlurred}
             />
           </div>
 
@@ -239,6 +254,7 @@ export const Battle: React.FC = () => {
               showAll={showAllKorea}
               onToggle={() => setShowAllKorea(!showAllKorea)}
               color="korea"
+              isBlurred={isBlurred}
             />
           </div>
         </div>
