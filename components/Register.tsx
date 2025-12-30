@@ -290,7 +290,7 @@ export const Register: React.FC<RegisterProps> = ({ selectedSchool, setSelectedS
               </div>
               <div className="pt-3 border-t border-white/5">
                 <p className="text-brand-line/50 mb-1">입금 계좌</p>
-                <p className="font-mono text-brand-text">012501-04-276014 (국민은행)</p>
+                <p className="font-mono text-brand-text">012501-04-276014 국민은행 / 예금주 : 인사이더스</p>
               </div>
             </div>
 
