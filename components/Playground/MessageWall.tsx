@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, X, Send, MessageCircle, ChevronDown, ChevronUp } from 'lucide-react';
-import { Message, MessageComment, getMessages, createMessage, getComments, createComment } from '../../lib/supabase';
+import { Plus, X, Send, MessageCircle, ChevronDown, ChevronUp, Heart } from 'lucide-react';
+import { Message, MessageComment, getMessages, createMessage, getComments, createComment, likeMessage } from '../../lib/supabase';
 
 export const MessageWall: React.FC = () => {
     const [messages, setMessages] = useState<Message[]>([]);
@@ -63,6 +63,35 @@ export const MessageWall: React.FC = () => {
         }
     };
 
+    // Track liked messages in localStorage
+    const [likedMessages, setLikedMessages] = useState<Set<string>>(() => {
+        const saved = localStorage.getItem('likedMessages');
+        return saved ? new Set(JSON.parse(saved)) : new Set();
+    });
+
+    const handleLike = async (messageId: string, e: React.MouseEvent) => {
+        e.stopPropagation();
+        const isCurrentlyLiked = likedMessages.has(messageId);
+        const result = await likeMessage(messageId, isCurrentlyLiked);
+
+        if (result.success && result.newCount !== undefined) {
+            // Update messages
+            setMessages(prev => prev.map(msg =>
+                msg.id === messageId ? { ...msg, likes_count: result.newCount! } : msg
+            ));
+
+            // Update likedMessages
+            const newLiked = new Set(likedMessages);
+            if (isCurrentlyLiked) {
+                newLiked.delete(messageId);
+            } else {
+                newLiked.add(messageId);
+            }
+            setLikedMessages(newLiked);
+            localStorage.setItem('likedMessages', JSON.stringify([...newLiked]));
+        }
+    };
+
     return (
         <div className="pt-20 pb-16 min-h-screen">
             <div className="max-w-7xl mx-auto px-4 md:px-8">
@@ -72,7 +101,7 @@ export const MessageWall: React.FC = () => {
                         Message Wall
                     </h1>
                     <p className="text-brand-line/60 text-sm">
-                        자유롭게 메시지를 남겨주세요! 모든 글은 익명입니다.
+                        인사이더스 선후배에게 새해 인사를 남겨보세요! 모든 글은 익명입니다.
                     </p>
                 </div>
 
@@ -88,9 +117,11 @@ export const MessageWall: React.FC = () => {
                                 key={message.id}
                                 message={message}
                                 isExpanded={expandedMessage === message.id}
+                                isLiked={likedMessages.has(message.id)}
                                 comments={comments[message.id] || []}
                                 loadingComments={loadingComments === message.id}
                                 onToggle={() => handleToggleComments(message.id)}
+                                onLike={(e) => handleLike(message.id, e)}
                                 newComment={expandedMessage === message.id ? newComment : ''}
                                 onCommentChange={setNewComment}
                                 onAddComment={() => handleAddComment(message.id)}
@@ -197,9 +228,11 @@ export const MessageWall: React.FC = () => {
 interface PostItCardProps {
     message: Message;
     isExpanded: boolean;
+    isLiked: boolean;
     comments: MessageComment[];
     loadingComments: boolean;
     onToggle: () => void;
+    onLike: (e: React.MouseEvent) => void;
     newComment: string;
     onCommentChange: (value: string) => void;
     onAddComment: () => void;
@@ -208,9 +241,11 @@ interface PostItCardProps {
 const PostItCard: React.FC<PostItCardProps> = ({
     message,
     isExpanded,
+    isLiked,
     comments,
     loadingComments,
     onToggle,
+    onLike,
     newComment,
     onCommentChange,
     onAddComment
@@ -245,9 +280,19 @@ const PostItCard: React.FC<PostItCardProps> = ({
 
                 {/* Footer */}
                 <div className="flex items-center justify-between mt-3 pt-2 border-t border-black/10">
-                    <span className="text-xs text-gray-500">
-                        {formatDate(message.created_at)}
-                    </span>
+                    <div className="flex items-center gap-2">
+                        <span className="text-xs text-gray-500">
+                            {formatDate(message.created_at)}
+                        </span>
+                        {/* Like Button */}
+                        <button
+                            onClick={onLike}
+                            className={`flex items-center gap-1 transition-colors ${isLiked ? 'text-red-500' : 'text-gray-500 hover:text-red-500'}`}
+                        >
+                            <Heart className="w-3.5 h-3.5" fill={isLiked ? 'currentColor' : 'none'} />
+                            <span className="text-xs">{message.likes_count}</span>
+                        </button>
+                    </div>
                     <div className="flex items-center gap-1 text-gray-500">
                         <MessageCircle className="w-3.5 h-3.5" />
                         <span className="text-xs">{comments.length}</span>

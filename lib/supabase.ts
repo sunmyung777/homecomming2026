@@ -189,6 +189,7 @@ export interface Message {
     content: string;
     color: string;
     rotation: number;
+    likes_count: number;
     created_at: string;
 }
 
@@ -202,19 +203,19 @@ export interface MessageComment {
 // Message Wall API Functions
 const POST_IT_COLORS = ['#fef08a', '#fde68a', '#d9f99d', '#a5f3fc', '#c4b5fd', '#fecaca', '#fbcfe8'];
 
-const MOCK_MESSAGES = [
-    { id: '1', content: '안녕하세요! 인사이더스 화이팅! 🎉', color: '#fef08a', rotation: -3, created_at: new Date().toISOString() },
-    { id: '2', content: '창립제 너무 기대돼요~ 케미스트리 강남에서 만나요!', color: '#d9f99d', rotation: 2, created_at: new Date().toISOString() },
-    { id: '3', content: '선배님들 반가워요! 29기 파이팅 💪', color: '#a5f3fc', rotation: -1, created_at: new Date().toISOString() },
-    { id: '4', content: '10기 OB입니다. 오랜만에 후배들 얼굴 보니 감회가 새롭네요 ㅎㅎ', color: '#c4b5fd', rotation: 4, created_at: new Date().toISOString() },
-    { id: '5', content: '연고전도 하고 창립제도 하고... 인사이더스 최고 🏆', color: '#fecaca', rotation: -2, created_at: new Date().toISOString() },
-    { id: '6', content: '15기인데 동기들 많이 왔으면 좋겠다!!', color: '#fbcfe8', rotation: 1, created_at: new Date().toISOString() },
-    { id: '7', content: '후배님들 응원합니다 🙌 항상 건강하고 행복하세요', color: '#fde68a', rotation: -4, created_at: new Date().toISOString() },
-    { id: '8', content: '2026년 새해 복 많이 받으세요! 창립제에서 봐요~', color: '#d9f99d', rotation: 3, created_at: new Date().toISOString() },
-    { id: '9', content: '28기 막내였는데 벌써 29기가 들어오다니... 시간 빠르다', color: '#a5f3fc', rotation: -1, created_at: new Date().toISOString() },
-    { id: '10', content: '인사이더스에서의 추억이 제 대학생활 최고의 기억입니다 ❤️', color: '#fef08a', rotation: 2, created_at: new Date().toISOString() },
-    { id: '11', content: '22기입니다! 동기들 연락좀 해줘~', color: '#c4b5fd', rotation: -3, created_at: new Date().toISOString() },
-    { id: '12', content: '다들 건강하게 잘 지내고 있죠? 창립제에서 만나요!', color: '#fbcfe8', rotation: 1, created_at: new Date().toISOString() },
+const MOCK_MESSAGES: Message[] = [
+    { id: '1', content: '안녕하세요! 인사이더스 화이팅! 🎉', color: '#fef08a', rotation: -3, likes_count: 5, created_at: new Date().toISOString() },
+    { id: '2', content: '창립제 너무 기대돼요~ 케미스트리 강남에서 만나요!', color: '#d9f99d', rotation: 2, likes_count: 3, created_at: new Date().toISOString() },
+    { id: '3', content: '선배님들 반가워요! 29기 파이팅 💪', color: '#a5f3fc', rotation: -1, likes_count: 8, created_at: new Date().toISOString() },
+    { id: '4', content: '10기 OB입니다. 오랜만에 후배들 얼굴 보니 감회가 새롭네요 ㅎㅎ', color: '#c4b5fd', rotation: 4, likes_count: 12, created_at: new Date().toISOString() },
+    { id: '5', content: '연고전도 하고 창립제도 하고... 인사이더스 최고 🏆', color: '#fecaca', rotation: -2, likes_count: 7, created_at: new Date().toISOString() },
+    { id: '6', content: '15기인데 동기들 많이 왔으면 좋겠다!!', color: '#fbcfe8', rotation: 1, likes_count: 4, created_at: new Date().toISOString() },
+    { id: '7', content: '후배님들 응원합니다 🙌 항상 건강하고 행복하세요', color: '#fde68a', rotation: -4, likes_count: 15, created_at: new Date().toISOString() },
+    { id: '8', content: '2026년 새해 복 많이 받으세요! 창립제에서 봐요~', color: '#d9f99d', rotation: 3, likes_count: 6, created_at: new Date().toISOString() },
+    { id: '9', content: '28기 막내였는데 벌써 29기가 들어오다니... 시간 빠르다', color: '#a5f3fc', rotation: -1, likes_count: 2, created_at: new Date().toISOString() },
+    { id: '10', content: '인사이더스에서의 추억이 제 대학생활 최고의 기억입니다 ❤️', color: '#fef08a', rotation: 2, likes_count: 20, created_at: new Date().toISOString() },
+    { id: '11', content: '22기입니다! 동기들 연락좀 해줘~', color: '#c4b5fd', rotation: -3, likes_count: 9, created_at: new Date().toISOString() },
+    { id: '12', content: '다들 건강하게 잘 지내고 있죠? 창립제에서 만나요!', color: '#fbcfe8', rotation: 1, likes_count: 11, created_at: new Date().toISOString() },
 ];
 
 export const getMessages = async (): Promise<Message[]> => {
@@ -247,6 +248,7 @@ export const createMessage = async (content: string): Promise<{ success: boolean
             content,
             color: POST_IT_COLORS[Math.floor(Math.random() * POST_IT_COLORS.length)],
             rotation: (Math.random() - 0.5) * 10,
+            likes_count: 0,
             created_at: new Date().toISOString()
         };
         return { success: true, message: newMessage };
@@ -330,5 +332,45 @@ export const createComment = async (messageId: string, content: string): Promise
     } catch (err) {
         console.error('Create comment error:', err);
         return { success: false, error: 'Failed to create comment' };
+    }
+};
+
+export const likeMessage = async (messageId: string, isCurrentlyLiked: boolean): Promise<{ success: boolean; newCount?: number; error?: string }> => {
+    const delta = isCurrentlyLiked ? -1 : 1; // Unlike = -1, Like = +1
+
+    if (!supabase) {
+        // Mock: just return success with toggled count
+        return { success: true, newCount: Math.max(0, delta) };
+    }
+
+    try {
+        // First get current count
+        const { data: current, error: fetchError } = await supabase
+            .from('messages')
+            .select('likes_count')
+            .eq('id', messageId)
+            .single();
+
+        if (fetchError) {
+            console.warn('Like message fetch error:', fetchError);
+            return { success: true, newCount: Math.max(0, delta) };
+        }
+
+        const newCount = Math.max(0, (current?.likes_count || 0) + delta);
+
+        const { error: updateError } = await supabase
+            .from('messages')
+            .update({ likes_count: newCount })
+            .eq('id', messageId);
+
+        if (updateError) {
+            console.warn('Like message update error:', updateError);
+            return { success: true, newCount: Math.max(0, delta) };
+        }
+
+        return { success: true, newCount };
+    } catch (err) {
+        console.warn('Like message error:', err);
+        return { success: true, newCount: Math.max(0, delta) };
     }
 };
