@@ -1,10 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Home, Users, Calendar } from 'lucide-react';
+import { Home, Users, Calendar, MessageSquare } from 'lucide-react';
 
 interface PlaygroundNavProps {
-    activeTab: 'insiders' | 'timeline';
-    onTabChange: (tab: 'insiders' | 'timeline') => void;
+    activeTab: 'insiders' | 'timeline' | 'wall';
+    onTabChange: (tab: 'insiders' | 'timeline' | 'wall') => void;
 }
 
 export const PlaygroundNav: React.FC<PlaygroundNavProps> = ({ activeTab, onTabChange }) => {
@@ -32,8 +32,8 @@ export const PlaygroundNav: React.FC<PlaygroundNavProps> = ({ activeTab, onTabCh
                         <button
                             onClick={() => onTabChange('insiders')}
                             className={`px-3 md:px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 flex items-center gap-2 ${activeTab === 'insiders'
-                                    ? 'text-accent-gold bg-accent-gold/10'
-                                    : 'text-brand-line/60 hover:text-brand-text'
+                                ? 'text-accent-gold bg-accent-gold/10'
+                                : 'text-brand-line/60 hover:text-brand-text'
                                 }`}
                         >
                             <Users className="w-4 h-4" />
@@ -44,12 +44,24 @@ export const PlaygroundNav: React.FC<PlaygroundNavProps> = ({ activeTab, onTabCh
                         <button
                             onClick={() => onTabChange('timeline')}
                             className={`px-3 md:px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 flex items-center gap-2 ${activeTab === 'timeline'
-                                    ? 'text-accent-gold bg-accent-gold/10'
-                                    : 'text-brand-line/60 hover:text-brand-text'
+                                ? 'text-accent-gold bg-accent-gold/10'
+                                : 'text-brand-line/60 hover:text-brand-text'
                                 }`}
                         >
                             <Calendar className="w-4 h-4" />
                             <span className="hidden md:inline">Timeline</span>
+                        </button>
+
+                        {/* Anonymous Wall Tab */}
+                        <button
+                            onClick={() => onTabChange('wall')}
+                            className={`px-3 md:px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 flex items-center gap-2 ${activeTab === 'wall'
+                                ? 'text-accent-gold bg-accent-gold/10'
+                                : 'text-brand-line/60 hover:text-brand-text'
+                                }`}
+                        >
+                            <MessageSquare className="w-4 h-4" />
+                            <span className="hidden md:inline">Message Wall</span>
                         </button>
                     </div>
                 </div>

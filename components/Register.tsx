@@ -16,11 +16,13 @@ export const Register: React.FC<RegisterProps> = ({ selectedSchool, setSelectedS
     phone: '',
     batch: '',
     message: '',
-    isSponsor: false
+    isSponsor: false,
+    request: ''
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [showSponsorToast, setShowSponsorToast] = useState(false);
 
   useEffect(() => {
     if (selectedSchool) {
@@ -50,6 +52,15 @@ export const Register: React.FC<RegisterProps> = ({ selectedSchool, setSelectedS
     }
   };
 
+  const handleSponsorToggle = () => {
+    const newValue = !formData.isSponsor;
+    setFormData(prev => ({ ...prev, isSponsor: newValue }));
+    if (newValue) {
+      setShowSponsorToast(true);
+      setTimeout(() => setShowSponsorToast(false), 3000);
+    }
+  };
+
   const [isDuplicate, setIsDuplicate] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -60,6 +71,10 @@ export const Register: React.FC<RegisterProps> = ({ selectedSchool, setSelectedS
       return;
     }
 
+    await actualSubmit();
+  };
+
+  const actualSubmit = async (withSponsor?: boolean) => {
     setIsSubmitting(true);
 
     try {
@@ -68,7 +83,8 @@ export const Register: React.FC<RegisterProps> = ({ selectedSchool, setSelectedS
         phone: formData.phone || '',
         batch: formData.batch || '',
         school: selectedSchool === School.YONSEI ? 'YONSEI' : 'KOREA',
-        is_sponsor: formData.isSponsor || false
+        is_sponsor: formData.isSponsor ?? false,
+        request: formData.request || ''
       });
 
       if (result.success) {
@@ -155,8 +171,27 @@ export const Register: React.FC<RegisterProps> = ({ selectedSchool, setSelectedS
     </AnimatePresence>
   );
 
+  // Toast Component for sponsor feedback
+  const SponsorToast = () => (
+    <AnimatePresence>
+      {showSponsorToast && (
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 50 }}
+          className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-gradient-to-r from-amber-500 to-amber-600 text-white px-6 py-4 rounded-2xl shadow-xl flex items-center gap-3"
+        >
+          <span className="text-2xl">🙇</span>
+          <span className="font-medium">감사합니다! 개별적으로 정중히 안내드리겠습니다</span>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+
   return (
     <Section id="register" className="relative overflow-hidden mt-20">
+      {/* Sponsor Toast */}
+      <SponsorToast />
       {/* Success Modal */}
       <Modal
         show={isSuccess}
@@ -294,19 +329,101 @@ export const Register: React.FC<RegisterProps> = ({ selectedSchool, setSelectedS
               </div>
             </div>
 
-            {/* Sponsor checkbox */}
-            <label className="flex items-center gap-3 p-4 bg-white/5 rounded-lg cursor-pointer border border-white/5 hover:border-white/10 transition-colors">
-              <input
-                type="checkbox"
-                name="isSponsor"
-                checked={formData.isSponsor}
+            {/* Sponsor Card - Premium Design */}
+            <motion.div
+              onClick={handleSponsorToggle}
+              whileHover={{ scale: 1.01 }}
+              whileTap={{ scale: 0.99 }}
+              className={`relative cursor-pointer rounded-2xl p-6 transition-all duration-300 border-2 overflow-hidden ${formData.isSponsor
+                ? 'border-amber-400/60 bg-gradient-to-br from-amber-500/20 via-amber-400/10 to-yellow-500/15'
+                : 'border-amber-400/20 bg-gradient-to-br from-amber-500/5 via-transparent to-yellow-500/5 hover:border-amber-400/40'
+                }`}
+            >
+              {/* Decorative gradient overlay */}
+              <div className="absolute inset-0 bg-gradient-to-r from-amber-400/0 via-amber-300/5 to-amber-400/0 pointer-events-none" />
+
+              {/* Content */}
+              <div className="relative z-10">
+                <div className="flex items-start gap-4">
+                  {/* Icon & Toggle */}
+                  <div className="flex-shrink-0">
+                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 ${formData.isSponsor
+                      ? 'bg-amber-400/30 shadow-lg shadow-amber-500/20'
+                      : 'bg-amber-400/10'
+                      }`}>
+                      <span className="text-2xl">{formData.isSponsor ? '✨' : '💛'}</span>
+                    </div>
+                  </div>
+
+                  {/* Text Content */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-2">
+                      <h4 className="font-bold text-lg text-amber-300">
+                        INSIDERS의 다음 세대를 응원하고 싶습니다
+                      </h4>
+                      {/* Toggle indicator */}
+                      <div className={`flex-shrink-0 w-10 h-6 rounded-full transition-all duration-300 flex items-center ${formData.isSponsor
+                        ? 'bg-amber-400 justify-end'
+                        : 'bg-white/10 justify-start'
+                        }`}>
+                        <motion.div
+                          layout
+                          transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                          className={`w-5 h-5 rounded-full mx-0.5 transition-colors ${formData.isSponsor ? 'bg-white' : 'bg-white/50'
+                            }`}
+                        />
+                      </div>
+                    </div>
+
+                    <p className="text-brand-line/90 text-sm leading-relaxed mb-3">
+                      선배님의 후원은 다음 세대 INSIDERS의 운영에 사용됩니다.
+                    </p>
+
+                    {/* Reassurance badges */}
+                    <div className="flex flex-wrap gap-2 mb-3">
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white/5 text-xs text-brand-line/70">
+                        <Check size={12} className="text-amber-400" /> 금액 자유
+                      </span>
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white/5 text-xs text-brand-line/70">
+                        <Check size={12} className="text-amber-400" /> 참여 여부 자유
+                      </span>
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white/5 text-xs text-brand-line/70">
+                        <Check size={12} className="text-amber-400" /> 체크만 해주셔도 충분합니다
+                      </span>
+                    </div>
+
+                    {/* Motivational line */}
+                    <p className="text-xs text-amber-400/80 italic">
+                      ✦ 선배님의 작은 응원이 INSIDERS 2026을 만듭니다
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Selected state glow effect */}
+              {formData.isSponsor && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="absolute inset-0 rounded-2xl bg-gradient-to-r from-amber-400/5 via-transparent to-amber-400/5 pointer-events-none"
+                />
+              )}
+            </motion.div>
+
+            {/* Request Field (Optional) */}
+            <div>
+              <label className="block text-xs font-medium text-brand-line/70 uppercase tracking-wider mb-2">
+                요청사항 <span className="text-brand-line/40">(선택)</span>
+              </label>
+              <textarea
+                name="request"
+                value={formData.request}
                 onChange={handleChange}
-                className="w-4 h-4 rounded border-white/20 bg-transparent text-accent-gold focus:ring-accent-gold/50"
+                rows={3}
+                className="w-full bg-white/5 border border-white/10 rounded-lg py-3.5 px-4 text-brand-text focus:border-accent-gold/50 focus:outline-none transition-colors placeholder:text-brand-line/30 resize-none"
+                placeholder="29기 운영진에게 바라는 점을 자유롭게 말씀해 주세요 (ex. 함께하고 싶은 선배님, NN기 친구들 많이 불러주세요~ 등)"
               />
-              <span className="text-brand-text/70 text-sm">
-                창립제 후원 의사가 있습니다 (개별 연락 예정)
-              </span>
-            </label>
+            </div>
 
             {/* Submit button */}
             <button
