@@ -5,6 +5,15 @@ import { ChevronDown, ChevronUp } from 'lucide-react';
 
 const INITIAL_SHOW_COUNT = 5;
 
+// Helper function to sort by batch number (e.g., "29기" -> 29)
+const sortByBatch = (registrants: Registrant[]): Registrant[] => {
+  return [...registrants].sort((a, b) => {
+    const batchA = parseInt(a.batch.replace(/[^0-9]/g, ''), 10) || 0;
+    const batchB = parseInt(b.batch.replace(/[^0-9]/g, ''), 10) || 0;
+    return batchA - batchB;
+  });
+};
+
 export const Battle: React.FC = () => {
   const [stats, setStats] = useState({ yonsei: 0, korea: 0 });
   const [yonseiCount, setYonseiCount] = useState(0);
@@ -19,7 +28,7 @@ export const Battle: React.FC = () => {
   const [showAllKorea, setShowAllKorea] = useState(false);
 
   // Blur control for participant list - set to false to reveal participants
-  const isBlurred = true;
+  const isBlurred = false;
 
   // Fetch initial stats and registrants
   useEffect(() => {
@@ -29,8 +38,8 @@ export const Battle: React.FC = () => {
 
       const yonseiData = await getRegistrantsBySchool('YONSEI');
       const koreaData = await getRegistrantsBySchool('KOREA');
-      setYonseiRegistrants(yonseiData);
-      setKoreaRegistrants(koreaData);
+      setYonseiRegistrants(sortByBatch(yonseiData));
+      setKoreaRegistrants(sortByBatch(koreaData));
     };
 
     fetchData();
@@ -40,8 +49,8 @@ export const Battle: React.FC = () => {
       // Refresh registrant lists on stats change
       const yonseiData = await getRegistrantsBySchool('YONSEI');
       const koreaData = await getRegistrantsBySchool('KOREA');
-      setYonseiRegistrants(yonseiData);
-      setKoreaRegistrants(koreaData);
+      setYonseiRegistrants(sortByBatch(yonseiData));
+      setKoreaRegistrants(sortByBatch(koreaData));
     });
 
     return () => {
