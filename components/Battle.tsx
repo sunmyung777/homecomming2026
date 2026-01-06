@@ -28,7 +28,7 @@ export const Battle: React.FC = () => {
   const [showAllKorea, setShowAllKorea] = useState(false);
 
   // Blur control for participant list - set to false to reveal participants
-  const isBlurred = false;
+  const isBlurred = true;
 
   // Fetch initial stats and registrants
   useEffect(() => {
