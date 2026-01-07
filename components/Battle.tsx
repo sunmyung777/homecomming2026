@@ -5,6 +5,83 @@ import { ChevronDown, ChevronUp } from 'lucide-react';
 
 const INITIAL_SHOW_COUNT = 5;
 
+// 가짜 데이터 - Supabase에 없는 경우에만 표시됨
+const FAKE_YONSEI_REGISTRANTS: Registrant[] = [
+  { batch: '20기', name: '국진혁' },
+  { batch: '23기', name: '정하진' },
+  { batch: '10기', name: '정재원' },
+  { batch: '22기', name: '이제홍' },
+  { batch: '4기', name: '김강안' },
+  { batch: '13기', name: '박인엽' },
+  { batch: '4기', name: '이인하' },
+  { batch: '16기', name: '임관섭' },
+  { batch: '3기', name: '이건호' },
+  { batch: '12기', name: '이상헌' },
+  { batch: '7기', name: '방역주' },
+  { batch: '12기', name: '김활' },
+  { batch: '3기', name: '최준순' },
+  { batch: '17기', name: '김완성' },
+  { batch: '12기', name: '박현준' },
+  { batch: '22기', name: '정준우' },
+  { batch: '1기', name: '김진우' },
+  { batch: '22기', name: '안세현' },
+  { batch: '21기', name: '김수연' },
+  { batch: '5기', name: '최윤영' },
+  { batch: '27기', name: '박인찬' },
+  { batch: '26기', name: '김태현' },
+  { batch: '26기', name: '정진호' },
+  { batch: '24기', name: '김유겸' },
+  { batch: '26기', name: '김도희' },
+  { batch: '25기', name: '남예지' },
+  { batch: '27기', name: '정호수' },
+  { batch: '28기', name: '추명현' },
+  { batch: '28기', name: '정세준' },
+  { batch: '28기', name: '정현우' },
+  { batch: '28기', name: '양승연' },
+  { batch: '28기', name: '엄선명' },
+];
+
+const FAKE_KOREA_REGISTRANTS: Registrant[] = [
+  { batch: '20기', name: '이수영' },
+  { batch: '22기', name: '김예지' },
+  { batch: '1기', name: '정근식' },
+  { batch: '10기', name: '최익중' },
+  { batch: '13기', name: '윤예슬' },
+  { batch: '20기', name: '오경훈' },
+  { batch: '7기', name: '오상준' },
+  { batch: '11기', name: '허재성' },
+  { batch: '23기', name: '제지원' },
+  { batch: '20기', name: '이은석' },
+  { batch: '23기', name: '이청훈' },
+  { batch: '15기', name: '윤성재' },
+  { batch: '24기', name: '김상우' },
+  { batch: '24기', name: '서예명' },
+  { batch: '26기', name: '김민규' },
+  { batch: '27기', name: '권기빈' },
+  { batch: '24기', name: '이건우' },
+  { batch: '27기', name: '김동영' },
+  { batch: '28기', name: '남영빈' },
+  { batch: '28기', name: '윤준성' },
+  { batch: '28기', name: '박재영' },
+  { batch: '28기', name: '박상하' },
+  { batch: '28기', name: '송시아' },
+  { batch: '28기', name: '황지원' },
+  { batch: '28기', name: '신주훈' },
+  { batch: '28기', name: '강지원' },
+];
+
+// Helper function to merge fake data with real data (no duplicates)
+const mergeWithFakeData = (realData: Registrant[], fakeData: Registrant[]): Registrant[] => {
+  const realSet = new Set(realData.map(r => `${r.batch}-${r.name}`));
+  const filteredFake = fakeData.filter(f => !realSet.has(`${f.batch}-${f.name}`));
+  return [...realData, ...filteredFake];
+};
+
+// Helper function to filter out 29기 from the list
+const filterOut29 = (registrants: Registrant[]): Registrant[] => {
+  return registrants.filter(r => r.batch !== '29기');
+};
+
 // Helper function to sort by batch number (e.g., "29기" -> 29)
 const sortByBatch = (registrants: Registrant[]): Registrant[] => {
   return [...registrants].sort((a, b) => {
@@ -28,29 +105,45 @@ export const Battle: React.FC = () => {
   const [showAllKorea, setShowAllKorea] = useState(false);
 
   // Blur control for participant list - set to false to reveal participants
-  const isBlurred = true;
+  const isBlurred = false;
 
   // Fetch initial stats and registrants
   useEffect(() => {
     const fetchData = async () => {
-      const statsData = await getSchoolStats();
-      setStats(statsData);
-
       const yonseiData = await getRegistrantsBySchool('YONSEI');
       const koreaData = await getRegistrantsBySchool('KOREA');
-      setYonseiRegistrants(sortByBatch(yonseiData));
-      setKoreaRegistrants(sortByBatch(koreaData));
+
+      // Merge with fake data (duplicates are automatically filtered)
+      const mergedYonsei = mergeWithFakeData(yonseiData, FAKE_YONSEI_REGISTRANTS);
+      const mergedKorea = mergeWithFakeData(koreaData, FAKE_KOREA_REGISTRANTS);
+
+      // Filter out 29기 from both stats and display
+      const filteredYonsei = filterOut29(mergedYonsei);
+      const filteredKorea = filterOut29(mergedKorea);
+
+      setStats({ yonsei: filteredYonsei.length, korea: filteredKorea.length });
+      setYonseiRegistrants(sortByBatch(filteredYonsei));
+      setKoreaRegistrants(sortByBatch(filteredKorea));
     };
 
     fetchData();
 
-    const subscription = subscribeToStats(async (newStats) => {
-      setStats(newStats);
+    const subscription = subscribeToStats(async () => {
       // Refresh registrant lists on stats change
       const yonseiData = await getRegistrantsBySchool('YONSEI');
       const koreaData = await getRegistrantsBySchool('KOREA');
-      setYonseiRegistrants(sortByBatch(yonseiData));
-      setKoreaRegistrants(sortByBatch(koreaData));
+
+      // Merge with fake data (duplicates are automatically filtered)
+      const mergedYonsei = mergeWithFakeData(yonseiData, FAKE_YONSEI_REGISTRANTS);
+      const mergedKorea = mergeWithFakeData(koreaData, FAKE_KOREA_REGISTRANTS);
+
+      // Filter out 29기 from both stats and display
+      const filteredYonsei = filterOut29(mergedYonsei);
+      const filteredKorea = filterOut29(mergedKorea);
+
+      setStats({ yonsei: filteredYonsei.length, korea: filteredKorea.length });
+      setYonseiRegistrants(sortByBatch(filteredYonsei));
+      setKoreaRegistrants(sortByBatch(filteredKorea));
     });
 
     return () => {
