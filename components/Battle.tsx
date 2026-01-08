@@ -91,6 +91,17 @@ const sortByBatch = (registrants: Registrant[]): Registrant[] => {
   });
 };
 
+// Helper function to mask name (middle character for 3+, last for 2)
+const maskName = (name: string): string => {
+  if (name.length <= 1) return name;
+  if (name.length === 2) {
+    return name[0] + '*';
+  }
+  // 3+ characters: mask middle character(s)
+  const midIndex = Math.floor(name.length / 2);
+  return name.slice(0, midIndex) + '*' + name.slice(midIndex + 1);
+};
+
 export const Battle: React.FC = () => {
   const [stats, setStats] = useState({ yonsei: 0, korea: 0 });
   const [yonseiCount, setYonseiCount] = useState(0);
@@ -229,7 +240,7 @@ export const Battle: React.FC = () => {
               className={`text-xs ${color === 'yonsei' ? 'text-[#4B73A8]/70' : 'text-[#A84B52]/70'
                 }`}
             >
-              {reg.batch} {reg.name}
+              {reg.batch} {maskName(reg.name)}
             </span>
           ))}
         </div>
