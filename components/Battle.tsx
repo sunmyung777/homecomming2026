@@ -19,7 +19,6 @@ const FAKE_YONSEI_REGISTRANTS: Registrant[] = [
   { batch: '12기', name: '이상헌' },
   { batch: '7기', name: '방역주' },
   { batch: '12기', name: '김활' },
-  { batch: '3기', name: '최준순' },
   { batch: '17기', name: '김완성' },
   { batch: '12기', name: '박현준' },
   { batch: '22기', name: '정준우' },
