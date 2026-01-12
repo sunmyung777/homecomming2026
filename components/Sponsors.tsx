@@ -2,7 +2,11 @@ import React from 'react';
 import { Section } from './ui/Section';
 
 const SPONSORS = [
-  { name: '선배님 성함', company: '선배님 회사' },
+  { name: '26기 전윤하', company: 'HOWEVER' },
+  { name: '12기 이상헌', company: 'Voithru' },
+  { name: '1기 정근식', company: 'Refilled' },
+  { name: '24기 서예명 이건우 홍서혜', company: '위글리' },
+  { name: '3기 이건호', company: '샐러디' },
 ];
 
 export const Sponsors: React.FC = () => {
