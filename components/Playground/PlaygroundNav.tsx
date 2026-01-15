@@ -1,10 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Home, Users, Calendar, MessageSquare } from 'lucide-react';
+import { Home, Users, Calendar, MessageSquare, Gamepad2 } from 'lucide-react';
 
 interface PlaygroundNavProps {
-    activeTab: 'insiders' | 'timeline' | 'wall';
-    onTabChange: (tab: 'insiders' | 'timeline' | 'wall') => void;
+    activeTab: 'insiders' | 'timeline' | 'wall' | 'recreation';
+    onTabChange: (tab: 'insiders' | 'timeline' | 'wall' | 'recreation') => void;
 }
 
 export const PlaygroundNav: React.FC<PlaygroundNavProps> = ({ activeTab, onTabChange }) => {
@@ -62,6 +62,18 @@ export const PlaygroundNav: React.FC<PlaygroundNavProps> = ({ activeTab, onTabCh
                         >
                             <MessageSquare className="w-4 h-4" />
                             <span className="hidden md:inline">Message Wall</span>
+                        </button>
+
+                        {/* Recreation Tab */}
+                        <button
+                            onClick={() => onTabChange('recreation')}
+                            className={`px-3 md:px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 flex items-center gap-2 ${activeTab === 'recreation'
+                                ? 'text-accent-gold bg-accent-gold/10'
+                                : 'text-brand-line/60 hover:text-brand-text'
+                                }`}
+                        >
+                            <Gamepad2 className="w-4 h-4" />
+                            <span className="hidden md:inline">Recreation</span>
                         </button>
                     </div>
                 </div>

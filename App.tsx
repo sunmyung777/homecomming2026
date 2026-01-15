@@ -9,6 +9,7 @@ import { Sponsors } from './components/Sponsors';
 import { Timeline } from './components/Timeline';
 import { Navbar } from './components/Navbar';
 import { PlaygroundPage } from './components/Playground/PlaygroundPage';
+import { AdminPage } from './components/AdminPage';
 import { School } from './types';
 
 // Home page component (current landing page)
@@ -71,6 +72,7 @@ function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/playground" element={<PlaygroundPage />} />
+        <Route path="/admin" element={<AdminPage />} />
       </Routes>
     </main>
   );

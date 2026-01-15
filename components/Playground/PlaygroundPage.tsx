@@ -3,9 +3,10 @@ import { PlaygroundNav } from './PlaygroundNav';
 import { InsidersSection } from './InsidersSection';
 import { Timeline } from '../Timeline';
 import { MessageWall } from './MessageWall';
+import { Recreation } from './Recreation';
 
 export const PlaygroundPage: React.FC = () => {
-    const [activeTab, setActiveTab] = useState<'insiders' | 'timeline' | 'wall'>('insiders');
+    const [activeTab, setActiveTab] = useState<'insiders' | 'timeline' | 'wall' | 'recreation'>('insiders');
 
     return (
         <div className="min-h-screen bg-brand-bg">
@@ -24,6 +25,8 @@ export const PlaygroundPage: React.FC = () => {
             )}
 
             {activeTab === 'wall' && <MessageWall />}
+
+            {activeTab === 'recreation' && <Recreation />}
         </div>
     );
 };
