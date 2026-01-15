@@ -974,3 +974,36 @@ export const subscribeToRegistrations = (callback: () => void) => {
         }
     };
 };
+
+// 현장 등록 (이름, 기수, 학교만으로 빠르게 등록 + 자동 체크인)
+export const addOnSiteRegistration = async (
+    name: string,
+    batch: string,
+    school: 'YONSEI' | 'KOREA'
+): Promise<{ success: boolean; error?: string }> => {
+    if (!supabase) return { success: true }; // Mock success
+
+    try {
+        const { error } = await supabase
+            .from('registrations')
+            .insert([{
+                name,
+                batch,
+                school,
+                phone: '현장등록',
+                is_sponsor: false,
+                is_paid: true,  // 현장 결제 완료
+                is_checked_in: true,  // 자동 체크인
+            }]);
+
+        if (error) {
+            console.error('On-site registration error:', error);
+            return { success: false, error: error.message };
+        }
+
+        return { success: true };
+    } catch (err) {
+        console.error('On-site registration error:', err);
+        return { success: false, error: 'Failed to add on-site registration' };
+    }
+};

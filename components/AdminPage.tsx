@@ -23,6 +23,7 @@ import {
     toggleCheckIn,
     togglePaid,
     subscribeToRegistrations,
+    addOnSiteRegistration,
 } from '../lib/supabase';
 
 // 간단한 비밀번호 보호 (1차 방어용)
@@ -50,6 +51,12 @@ export const AdminPage: React.FC = () => {
     const [registrations, setRegistrations] = useState<Registration[]>([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [filterStatus, setFilterStatus] = useState<'all' | 'checked' | 'unchecked'>('all');
+
+    // 현장 등록 관련 상태
+    const [onSiteName, setOnSiteName] = useState('');
+    const [onSiteBatch, setOnSiteBatch] = useState('');
+    const [onSiteSchool, setOnSiteSchool] = useState<'YONSEI' | 'KOREA'>('YONSEI');
+    const [onSiteLoading, setOnSiteLoading] = useState(false);
 
     // 비밀번호 확인 핸들러
     const handlePasswordSubmit = (e: React.FormEvent) => {
@@ -689,6 +696,72 @@ export const AdminPage: React.FC = () => {
                                 >
                                     <CheckCircle className="w-4 h-4" />
                                     체크인 완료
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* On-Site Registration */}
+                        <div className="bg-accent-gold/10 border border-accent-gold/30 rounded-2xl p-6">
+                            <h2 className="text-lg font-bold text-accent-gold mb-4">🎫 현장 등록</h2>
+                            <p className="text-sm text-brand-line/60 mb-4">현장 결제 참가자를 빠르게 등록합니다. (자동 체크인 처리됨)</p>
+                            <div className="flex gap-3 flex-wrap">
+                                <input
+                                    type="text"
+                                    value={onSiteName}
+                                    onChange={(e) => setOnSiteName(e.target.value)}
+                                    placeholder="이름"
+                                    className="flex-1 min-w-[120px] px-4 py-3 bg-brand-bg border border-white/10 rounded-xl text-brand-text placeholder-brand-line/30 focus:outline-none focus:ring-2 focus:ring-accent-gold/50"
+                                />
+                                <input
+                                    type="text"
+                                    value={onSiteBatch}
+                                    onChange={(e) => setOnSiteBatch(e.target.value)}
+                                    placeholder="기수 (예: 29기)"
+                                    className="w-[120px] px-4 py-3 bg-brand-bg border border-white/10 rounded-xl text-brand-text placeholder-brand-line/30 focus:outline-none focus:ring-2 focus:ring-accent-gold/50"
+                                />
+                                <div className="flex gap-2">
+                                    <button
+                                        onClick={() => setOnSiteSchool('YONSEI')}
+                                        className={`px-4 py-3 rounded-xl font-medium transition-all ${onSiteSchool === 'YONSEI'
+                                            ? 'bg-[#164075] text-white'
+                                            : 'bg-white/5 text-brand-line/60'
+                                            }`}
+                                    >
+                                        연세
+                                    </button>
+                                    <button
+                                        onClick={() => setOnSiteSchool('KOREA')}
+                                        className={`px-4 py-3 rounded-xl font-medium transition-all ${onSiteSchool === 'KOREA'
+                                            ? 'bg-[#781820] text-white'
+                                            : 'bg-white/5 text-brand-line/60'
+                                            }`}
+                                    >
+                                        고려
+                                    </button>
+                                </div>
+                                <button
+                                    onClick={async () => {
+                                        if (!onSiteName.trim() || !onSiteBatch.trim()) return;
+                                        setOnSiteLoading(true);
+                                        const result = await addOnSiteRegistration(onSiteName.trim(), onSiteBatch.trim(), onSiteSchool);
+                                        if (result.success) {
+                                            setOnSiteName('');
+                                            setOnSiteBatch('');
+                                            loadData();
+                                        } else {
+                                            alert('등록 실패: ' + result.error);
+                                        }
+                                        setOnSiteLoading(false);
+                                    }}
+                                    disabled={!onSiteName.trim() || !onSiteBatch.trim() || onSiteLoading}
+                                    className="px-6 py-3 bg-accent-gold text-brand-bg font-bold rounded-xl transition-all hover:bg-accent-gold/90 disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2"
+                                >
+                                    {onSiteLoading ? (
+                                        <div className="animate-spin w-4 h-4 border-2 border-brand-bg border-t-transparent rounded-full" />
+                                    ) : (
+                                        <Plus className="w-4 h-4" />
+                                    )}
+                                    등록
                                 </button>
                             </div>
                         </div>
