@@ -706,28 +706,50 @@ export const setActiveQuestion = async (id: string): Promise<{ success: boolean;
     if (!supabase) return { success: false, error: 'Supabase not configured' };
 
     try {
-        // First, deactivate all questions
-        await supabase
+        // First, check if this question is already active
+        const { data: currentQuestion, error: fetchError } = await supabase
             .from('balance_game_questions')
-            .update({ is_active: false })
-            .neq('id', '');
+            .select('is_active')
+            .eq('id', id)
+            .single();
 
-        // Then activate the selected question
-        const { error } = await supabase
-            .from('balance_game_questions')
-            .update({ is_active: true })
-            .eq('id', id);
-
-        if (error) {
-            console.error('Set active question error:', error);
-            return { success: false, error: error.message };
+        if (fetchError) {
+            console.error('Fetch question error:', fetchError);
+            return { success: false, error: fetchError.message };
         }
 
-        // Clear all votes when changing question
+        const isCurrentlyActive = currentQuestion?.is_active || false;
+
+        // Deactivate ALL questions first (this ensures clean state)
+        const { error: deactivateError } = await supabase
+            .from('balance_game_questions')
+            .update({ is_active: false })
+            .not('id', 'is', null);  // Match all rows
+
+        if (deactivateError) {
+            console.error('Deactivate questions error:', deactivateError);
+            return { success: false, error: deactivateError.message };
+        }
+
+        // If the question was already active, we just deactivated it (toggle off)
+        // If it was not active, activate it now
+        if (!isCurrentlyActive) {
+            const { error: activateError } = await supabase
+                .from('balance_game_questions')
+                .update({ is_active: true })
+                .eq('id', id);
+
+            if (activateError) {
+                console.error('Activate question error:', activateError);
+                return { success: false, error: activateError.message };
+            }
+        }
+
+        // Clear all votes when changing/toggling question
         await supabase
             .from('balance_game_votes')
             .delete()
-            .neq('id', '');
+            .not('id', 'is', null);  // Match all rows
 
         return { success: true };
     } catch (err) {

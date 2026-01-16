@@ -150,7 +150,21 @@ export const AdminPage: React.FC = () => {
     // Set as current question
     const handleSetCurrent = async (question: BalanceGameQuestion) => {
         if (!question.id) return;
+
+        // Optimistic update: 먼저 로컬 상태를 즉시 업데이트
+        const isCurrentlyActive = question.is_active;
+        setQuestions(prevQuestions =>
+            prevQuestions.map(q => ({
+                ...q,
+                // 현재 활성화된 질문을 클릭하면 비활성화, 아니면 해당 질문만 활성화
+                is_active: isCurrentlyActive ? false : q.id === question.id
+            }))
+        );
+
+        // 서버에 변경 요청
         await setActiveQuestion(question.id);
+
+        // 서버 데이터와 동기화 (필요시)
         loadData();
     };
 
@@ -470,10 +484,14 @@ export const AdminPage: React.FC = () => {
                                                 </div>
                                                 <div className="flex items-center gap-2">
                                                     {question.is_active ? (
-                                                        <span className="px-3 py-1.5 text-xs font-medium text-accent-gold bg-accent-gold/10 rounded-lg flex items-center gap-1">
+                                                        <button
+                                                            onClick={() => handleSetCurrent(question)}
+                                                            className="px-3 py-1.5 text-xs font-medium text-accent-gold bg-accent-gold/10 rounded-lg flex items-center gap-1 hover:bg-accent-gold/20 transition-colors"
+                                                            title="클릭하여 비활성화"
+                                                        >
                                                             <Check className="w-3 h-3" />
                                                             진행중
-                                                        </span>
+                                                        </button>
                                                     ) : (
                                                         <button
                                                             onClick={() => handleSetCurrent(question)}

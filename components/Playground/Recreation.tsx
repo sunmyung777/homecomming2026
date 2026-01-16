@@ -173,8 +173,14 @@ export const Recreation: React.FC = () => {
         const activeQuestion = getActiveQuestion();
         if (!activeQuestion?.id || !userGroup || !isLeader) return;
 
+        // Optimistic update: 즉시 UI 업데이트
+        setVotes(prev => [
+            ...prev.filter(v => !(v.question_id === activeQuestion.id && v.group_number === userGroup)),
+            { question_id: activeQuestion.id, group_number: userGroup, vote, voter_name: userName }
+        ]);
+
         await submitBalanceVote(activeQuestion.id, userGroup, vote, userName);
-        loadData();
+        // Realtime 구독이 자동으로 동기화
     };
 
     // Handle reset vote
@@ -182,8 +188,11 @@ export const Recreation: React.FC = () => {
         const activeQuestion = getActiveQuestion();
         if (!activeQuestion?.id || !userGroup || !isLeader) return;
 
+        // Optimistic update: 즉시 UI에서 투표 제거
+        setVotes(prev => prev.filter(v => !(v.question_id === activeQuestion.id && v.group_number === userGroup)));
+
         await resetGroupVote(activeQuestion.id, userGroup);
-        loadData();
+        // Realtime 구독이 자동으로 동기화
     };
 
     const activeQuestion = getActiveQuestion();
@@ -321,8 +330,8 @@ export const Recreation: React.FC = () => {
                                     onClick={() => isLeader && !hasVoted && handleVote('A')}
                                     disabled={hasVoted || !isLeader}
                                     className={`relative aspect-[4/3] rounded-2xl border-2 transition-all duration-300 overflow-hidden ${currentVote === 'A'
-                                            ? 'border-[#4B73A8] shadow-lg shadow-[#4B73A8]/30'
-                                            : 'border-white/10 hover:border-[#4B73A8]/50'
+                                        ? 'border-[#4B73A8] shadow-lg shadow-[#4B73A8]/30'
+                                        : 'border-white/10 hover:border-[#4B73A8]/50'
                                         } ${!isLeader ? 'cursor-default' : ''}`}
                                     style={{
                                         background: currentVote === 'A' ? COLORS.blue.bg : 'transparent',
@@ -354,8 +363,8 @@ export const Recreation: React.FC = () => {
                                     onClick={() => isLeader && !hasVoted && handleVote('B')}
                                     disabled={hasVoted || !isLeader}
                                     className={`relative aspect-[4/3] rounded-2xl border-2 transition-all duration-300 overflow-hidden ${currentVote === 'B'
-                                            ? 'border-[#A84B52] shadow-lg shadow-[#A84B52]/30'
-                                            : 'border-white/10 hover:border-[#A84B52]/50'
+                                        ? 'border-[#A84B52] shadow-lg shadow-[#A84B52]/30'
+                                        : 'border-white/10 hover:border-[#A84B52]/50'
                                         } ${!isLeader ? 'cursor-default' : ''}`}
                                     style={{
                                         background: currentVote === 'B' ? COLORS.red.bg : 'transparent',
@@ -430,8 +439,8 @@ export const Recreation: React.FC = () => {
                                             animate={{ opacity: 1, scale: 1 }}
                                             transition={{ delay: groupNum * 0.03 }}
                                             className={`relative p-3 rounded-xl border transition-all ${isActive
-                                                    ? 'border-white/20 bg-white/5'
-                                                    : 'border-white/5 opacity-50'
+                                                ? 'border-white/20 bg-white/5'
+                                                : 'border-white/5 opacity-50'
                                                 }`}
                                         >
                                             <div className="text-center">
